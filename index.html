@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#060a18">
+  <meta name="description" content="Space Wars — a spaceship duel. Defeat bots, earn credits, upgrade your ship.">
+  <title>Space Wars</title>
+  <link rel="icon" href="Assets/spaceship_yellow.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="stage">
+      <canvas id="game" width="900" height="500"></canvas>
+
+      <!-- In-game top bar (pause / mute / fullscreen) -->
+      <div id="gamebar" class="hidden">
+        <button id="btn-pause" class="icon-btn" title="Pause (Esc)">&#10073;&#10073;</button>
+        <button id="btn-mute" class="icon-btn" title="Mute (M)">&#128266;</button>
+        <button id="btn-fs" class="icon-btn" title="Fullscreen (F)">&#x26F6;</button>
+      </div>
+    </div>
+
+    <!-- Touch controls -->
+    <div id="touch" class="hidden">
+      <div id="joy-zone">
+        <div id="joy-base"><div id="joy-knob"></div></div>
+      </div>
+      <div id="action-zone">
+        <button class="t-btn t-boost" data-action="boost">BOOST</button>
+        <button class="t-btn t-fire"  data-action="fire">FIRE</button>
+        <button class="t-btn t-dodge" data-action="dodge">DODGE</button>
+        <button class="t-btn t-multi" data-action="multi">BARRAGE</button>
+      </div>
+    </div>
+
+    <!-- Main menu -->
+    <div id="menu" class="overlay">
+      <div class="panel">
+        <h1 class="title">SPACE <span>WARS</span></h1>
+        <p class="subtitle">Defeat the bot &middot; earn credits &middot; upgrade your ship</p>
+
+        <div class="money-row">
+          <span class="money-label">CREDITS</span>
+          <span id="money" class="money-value">0</span>
+        </div>
+
+        <div class="diff-row" id="diff-row"></div>
+
+        <div id="upgrades" class="upgrades"></div>
+
+        <div class="menu-actions">
+          <button id="btn-start" class="big-btn primary">▶ START BATTLE</button>
+          <button id="btn-botbattle" class="big-btn">🤖 BOT BATTLE</button>
+        </div>
+        <div class="menu-footer">
+          <button id="btn-howto" class="link-btn">How to play</button>
+          <button id="btn-reset" class="link-btn danger">Reset progress</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to play -->
+    <div id="howto" class="overlay hidden">
+      <div class="panel small">
+        <h2>HOW TO PLAY</h2>
+        <div class="howto-grid">
+          <div>
+            <h3>⌨️ Keyboard / 🖱 Mouse</h3>
+            <ul>
+              <li><b>WASD / Arrows</b> — move</li>
+              <li><b>Shift</b> — boost (drains gas)</li>
+              <li><b>Space</b> — dodge blink (45 gas, brief immunity)</li>
+              <li><b>Enter / J / Click</b> — fire</li>
+              <li><b>B / Right-click</b> — barrage</li>
+              <li><b>Esc</b> pause &middot; <b>M</b> mute &middot; <b>F</b> fullscreen</li>
+            </ul>
+          </div>
+          <div>
+            <h3>📱 Touch</h3>
+            <ul>
+              <li><b>Left stick</b> — move</li>
+              <li><b>FIRE / DODGE / BARRAGE</b> — tap</li>
+              <li><b>BOOST</b> — hold</li>
+            </ul>
+            <h3>🎮 Gamepad</h3>
+            <ul>
+              <li><b>Left stick / D-pad</b> — move</li>
+              <li><b>A</b> dodge &middot; <b>X</b> fire &middot; <b>Y</b> barrage &middot; <b>RT</b> boost</li>
+            </ul>
+          </div>
+        </div>
+        <p class="tip">Your rockets home in on the enemy — upgrade <b>Homing Power</b> to make them relentless.
+        Ships wrap around the top and bottom of the arena. Win fights to earn credits.</p>
+        <button class="big-btn primary" id="btn-howto-close">GOT IT</button>
+      </div>
+    </div>
+
+    <!-- Pause -->
+    <div id="pause" class="overlay hidden">
+      <div class="panel small">
+        <h2>PAUSED</h2>
+        <div class="menu-actions">
+          <button id="btn-resume" class="big-btn primary">RESUME</button>
+          <button id="btn-quit" class="big-btn">QUIT TO MENU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game over -->
+    <div id="gameover" class="overlay hidden">
+      <div class="panel small">
+        <h2 id="go-title">YOU WIN!</h2>
+        <p id="go-reward" class="reward"></p>
+        <div class="menu-actions">
+          <button id="btn-again" class="big-btn primary">PLAY AGAIN</button>
+          <button id="btn-menu" class="big-btn">UPGRADES</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rotate hint -->
+    <div id="rotate-hint" class="hidden">↻ Rotate your device for the best experience</div>
+  </div>
+
+  <script src="js/game.js"></script>
+</body>
+</html>

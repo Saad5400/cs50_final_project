@@ -537,8 +537,9 @@ function drawFloaters() {
   ctx.globalAlpha = 1;
 }
 
-/* supply drops: spawn on the divider and drift into one side's half —
-   whoever's half it enters can grab it (smarter bots go for them too) */
+/* supply drops: spawn on the divider and drift into the player's half —
+   they're a reward for the player, never a gift to the enemy. In bot
+   battles they drift to either side and smarter bots hunt them down. */
 const POWERUP_TYPES = {
   repair: { color: '#33d17a' },
   gas:    { color: '#ffffff' },
@@ -552,7 +553,7 @@ function spawnPowerup() {
     x: W / 2,
     baseY: 70 + Math.random() * (H - 140), y: 0,
     phase: Math.random() * Math.PI * 2,
-    vx: (Math.random() < 0.5 ? -1 : 1) * (28 + Math.random() * 26),
+    vx: (botBattle ? (Math.random() < 0.5 ? -1 : 1) : -1) * (28 + Math.random() * 26),
     life: 14,
   });
 }

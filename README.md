@@ -44,7 +44,7 @@ Everything that made the original the original:
 ### What's enhanced
 
 - 📱 **Fully responsive** — the arena scales to any screen, sharp on high-DPI displays.
-- 🕹 **Touch controls** — floating virtual joystick + FIRE / DODGE / BARRAGE / BOOST buttons on mobile, with a rotate-to-landscape hint in portrait.
+- 🕹 **Touch controls** — floating virtual joystick + FIRE / DODGE / BARRAGE / BOOST buttons on mobile, in landscape and portrait alike.
 - 🎮 **Gamepad support** — left stick / d-pad to move, A dodge, X fire, Y barrage, RT boost (the original supported joysticks too!).
 - ✨ **Juice** — particle explosions, engine trails, dodge trails, screen shake, hit flashes, hit-stop freeze frames, slow-motion killing blows, floating damage numbers, a low-health warning vignette, immunity shimmer, an energy-field center divider, and an extra drifting starfield layer.
 - 🚀 **Campaign mode** — a 15-level roguelike run on a continuous difficulty curve (level 5 ≈ the old Hard, level 15 ≈ the old Impossible). Bot skills unlock level by level, rewards grow with depth, your HP carries between levels, and dying restarts the run. The original four difficulties live on as legacy modes.

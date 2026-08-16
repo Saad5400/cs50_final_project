@@ -440,18 +440,6 @@ h3 {
   width: 100%; height: 50px; border-radius: 25px;
 }
 
-/* ---------- rotate hint ---------- */
-#rotate-hint {
-  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
-  background: var(--card-elev);
-  border: 1px solid var(--hairline-strong);
-  border-radius: 9999px;
-  padding: 7px 16px;
-  font-size: 0.75rem; color: var(--body);
-  z-index: 60;
-  white-space: nowrap;
-}
-
 /* ---------- small screens ---------- */
 @media (max-width: 640px) {
   .howto-grid { grid-template-columns: 1fr; }
@@ -468,6 +456,12 @@ h3 {
   .t-boost { height: 42px; }
   #action-zone { gap: 9px; right: 10px; bottom: 14px; }
 }
+/* portrait: give boost the same wide bar it has in landscape */
+@media (orientation: portrait) {
+  #action-zone { justify-items: center; }
+  .t-boost { width: 164px; }
+}
+
 @media (max-height: 420px) {
   .panel { padding: 14px 18px; }
   .camp-card { padding: 8px 12px; margin-bottom: 10px; }

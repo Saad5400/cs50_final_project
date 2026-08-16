@@ -186,9 +186,6 @@ function resize() {
   canvas.width = Math.floor(cssW * dpr);
   canvas.height = Math.floor(cssH * dpr);
   ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
-
-  const portrait = vh > vw && vw < 700;
-  document.getElementById('rotate-hint').classList.toggle('hidden', !portrait);
 }
 window.addEventListener('resize', resize);
 window.addEventListener('orientationchange', () => setTimeout(resize, 250));

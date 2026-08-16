@@ -150,6 +150,62 @@ h3 {
   color: var(--ink);
 }
 
+/* ---------- win streak ---------- */
+.streak-row {
+  display: flex; align-items: baseline; justify-content: center; gap: 10px;
+  margin: -14px 0 24px;
+  font-size: 0.75rem;
+}
+.streak-value {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--ink);
+}
+.streak-next {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted-soft);
+}
+
+/* ---------- campaign ---------- */
+.camp-card {
+  background: var(--card-elev);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  text-align: left;
+}
+.camp-info { min-width: 0; flex: 1; }
+.camp-level {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.camp-level span { font-family: var(--font-mono); }
+.camp-total { color: var(--muted-soft); font-size: 0.8125rem; }
+.camp-ticks { display: flex; gap: 3px; margin: 8px 0 6px; }
+.camp-tick {
+  flex: 1; height: 4px; max-width: 16px;
+  border-radius: 2px;
+  background: var(--strong);
+}
+.camp-tick.done { background: var(--success); }
+.camp-tick.best:not(.done) { background: var(--muted-soft); }
+.camp-best {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted-soft);
+}
+.camp-actions {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.camp-actions .big-btn { flex: none; width: 150px; }
+.camp-actions .link-btn { font-size: 0.6875rem; }
+
 /* ---------- difficulty ---------- */
 .diff-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
 .diff-btn {
@@ -282,6 +338,38 @@ h3 {
   min-height: 1.5em;
 }
 
+/* ---------- game-over reward breakdown ---------- */
+.breakdown {
+  max-width: 320px;
+  margin: 0 auto 14px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 4px 14px;
+  background: var(--card-elev);
+  text-align: left;
+}
+.bd-row {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 6px 0;
+  font-size: 0.8125rem;
+  color: var(--body);
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.bd-row:last-child { border-bottom: none; }
+.bd-val {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.bd-total { color: var(--ink); font-weight: 500; }
+.bd-total .bd-val { color: var(--success); }
+.go-stats {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--muted-soft);
+  margin: -10px 0 20px;
+}
+
 /* ---------- in-game bar ---------- */
 #gamebar {
   position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
@@ -368,6 +456,10 @@ h3 {
 @media (max-width: 640px) {
   .howto-grid { grid-template-columns: 1fr; }
   .upgrades { grid-template-columns: 1fr 1fr; }
+  .camp-card { flex-direction: column; align-items: stretch; text-align: center; }
+  .camp-ticks { justify-content: center; }
+  .camp-tick { max-width: none; }
+  .camp-actions .big-btn { width: 100%; }
   .up-card { flex-direction: column; text-align: center; align-items: center; }
   .up-info { text-align: center; }
   #joy-base { left: 30px; bottom: 40px; width: 100px; height: 100px; }
@@ -378,6 +470,7 @@ h3 {
 }
 @media (max-height: 420px) {
   .panel { padding: 14px 18px; }
+  .camp-card { padding: 8px 12px; margin-bottom: 10px; }
   .subtitle { margin-bottom: 10px; }
   .money-row { margin-bottom: 10px; padding: 3px 14px; }
   .diff-row { margin-bottom: 10px; }

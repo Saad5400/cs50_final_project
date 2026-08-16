@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#060a18">
+  <meta name="theme-color" content="#0f0f0f">
   <meta name="description" content="Space Wars — a spaceship duel. Defeat bots, earn credits, upgrade your ship.">
   <title>Space Wars</title>
   <link rel="icon" href="Assets/spaceship_yellow.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,9 +19,24 @@
 
       <!-- In-game top bar (pause / mute / fullscreen) -->
       <div id="gamebar" class="hidden">
-        <button id="btn-pause" class="icon-btn" title="Pause (Esc)">&#10073;&#10073;</button>
-        <button id="btn-mute" class="icon-btn" title="Mute (M)">&#128266;</button>
-        <button id="btn-fs" class="icon-btn" title="Fullscreen (F)">&#x26F6;</button>
+        <button id="btn-pause" class="icon-btn" title="Pause (Esc)" aria-label="Pause">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <rect x="3" y="2" width="3.5" height="12" rx="1" fill="currentColor"/>
+            <rect x="9.5" y="2" width="3.5" height="12" rx="1" fill="currentColor"/>
+          </svg>
+        </button>
+        <button id="btn-mute" class="icon-btn" title="Mute (M)" aria-label="Mute">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M2 6v4h3l4 3V3L5 6H2z" fill="currentColor"/>
+            <path class="wave" d="M11 5.5a3.5 3.5 0 0 1 0 5" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+            <line class="slash" x1="11" y1="4" x2="14.5" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button id="btn-fs" class="icon-btn" title="Fullscreen (F)" aria-label="Fullscreen">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <path d="M2 6V2h4"/><path d="M10 2h4v4"/><path d="M14 10v4h-4"/><path d="M6 14H2v-4"/>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -28,31 +46,33 @@
         <div id="joy-base"><div id="joy-knob"></div></div>
       </div>
       <div id="action-zone">
-        <button class="t-btn t-boost" data-action="boost">BOOST</button>
-        <button class="t-btn t-fire"  data-action="fire">FIRE</button>
-        <button class="t-btn t-dodge" data-action="dodge">DODGE</button>
-        <button class="t-btn t-multi" data-action="multi">BARRAGE</button>
+        <button class="t-btn t-boost" data-action="boost">Boost</button>
+        <button class="t-btn t-fire"  data-action="fire">Fire</button>
+        <button class="t-btn t-dodge" data-action="dodge">Dodge</button>
+        <button class="t-btn t-multi" data-action="multi">Barrage</button>
       </div>
     </div>
 
     <!-- Main menu -->
     <div id="menu" class="overlay">
       <div class="panel">
-        <h1 class="title">SPACE <span>WARS</span></h1>
-        <p class="subtitle">Defeat the bot &middot; earn credits &middot; upgrade your ship</p>
+        <h1 class="title">Space Wars<span class="title-dot">_</span></h1>
+        <p class="subtitle">Defeat the bot. Earn credits. Upgrade your ship.</p>
 
         <div class="money-row">
-          <span class="money-label">CREDITS</span>
+          <span class="money-label">Credits</span>
           <span id="money" class="money-value">0</span>
         </div>
 
+        <p class="section-label">Difficulty</p>
         <div class="diff-row" id="diff-row"></div>
 
+        <p class="section-label">Upgrades</p>
         <div id="upgrades" class="upgrades"></div>
 
         <div class="menu-actions">
-          <button id="btn-start" class="big-btn primary">▶ START BATTLE</button>
-          <button id="btn-botbattle" class="big-btn">🤖 BOT BATTLE</button>
+          <button id="btn-start" class="big-btn primary">Start battle</button>
+          <button id="btn-botbattle" class="big-btn">Bot battle</button>
         </div>
         <div class="menu-footer">
           <button id="btn-howto" class="link-btn">How to play</button>
@@ -64,46 +84,46 @@
     <!-- How to play -->
     <div id="howto" class="overlay hidden">
       <div class="panel small">
-        <h2>HOW TO PLAY</h2>
+        <h2>How to play</h2>
         <div class="howto-grid">
           <div>
-            <h3>⌨️ Keyboard / 🖱 Mouse</h3>
+            <h3>Keyboard &amp; mouse</h3>
             <ul>
-              <li><b>WASD / Arrows</b> — move</li>
+              <li><b>WASD</b> / <b>Arrows</b> — move</li>
               <li><b>Shift</b> — boost (drains gas)</li>
               <li><b>Space</b> — dodge blink (45 gas, brief immunity)</li>
-              <li><b>Enter / J / Click</b> — fire</li>
-              <li><b>B / Right-click</b> — barrage</li>
+              <li><b>Enter</b> / <b>J</b> / <b>Click</b> — fire</li>
+              <li><b>B</b> / <b>Right-click</b> — barrage</li>
               <li><b>Esc</b> pause &middot; <b>M</b> mute &middot; <b>F</b> fullscreen</li>
             </ul>
           </div>
           <div>
-            <h3>📱 Touch</h3>
+            <h3>Touch</h3>
             <ul>
               <li><b>Left stick</b> — move</li>
-              <li><b>FIRE / DODGE / BARRAGE</b> — tap</li>
-              <li><b>BOOST</b> — hold</li>
+              <li><b>Fire</b> / <b>Dodge</b> / <b>Barrage</b> — tap</li>
+              <li><b>Boost</b> — hold</li>
             </ul>
-            <h3>🎮 Gamepad</h3>
+            <h3 class="howto-gap">Gamepad</h3>
             <ul>
-              <li><b>Left stick / D-pad</b> — move</li>
+              <li><b>Left stick</b> / <b>D-pad</b> — move</li>
               <li><b>A</b> dodge &middot; <b>X</b> fire &middot; <b>Y</b> barrage &middot; <b>RT</b> boost</li>
             </ul>
           </div>
         </div>
-        <p class="tip">Your rockets home in on the enemy — upgrade <b>Homing Power</b> to make them relentless.
+        <p class="tip">Your rockets home in on the enemy — upgrade Homing Power to make them relentless.
         Ships wrap around the top and bottom of the arena. Win fights to earn credits.</p>
-        <button class="big-btn primary" id="btn-howto-close">GOT IT</button>
+        <button class="big-btn primary" id="btn-howto-close">Got it</button>
       </div>
     </div>
 
     <!-- Pause -->
     <div id="pause" class="overlay hidden">
       <div class="panel small">
-        <h2>PAUSED</h2>
+        <h2>Paused</h2>
         <div class="menu-actions">
-          <button id="btn-resume" class="big-btn primary">RESUME</button>
-          <button id="btn-quit" class="big-btn">QUIT TO MENU</button>
+          <button id="btn-resume" class="big-btn primary">Resume</button>
+          <button id="btn-quit" class="big-btn">Quit to menu</button>
         </div>
       </div>
     </div>
@@ -111,17 +131,17 @@
     <!-- Game over -->
     <div id="gameover" class="overlay hidden">
       <div class="panel small">
-        <h2 id="go-title">YOU WIN!</h2>
+        <h2 id="go-title">You win</h2>
         <p id="go-reward" class="reward"></p>
         <div class="menu-actions">
-          <button id="btn-again" class="big-btn primary">PLAY AGAIN</button>
-          <button id="btn-menu" class="big-btn">UPGRADES</button>
+          <button id="btn-again" class="big-btn primary">Play again</button>
+          <button id="btn-menu" class="big-btn">Upgrades</button>
         </div>
       </div>
     </div>
 
     <!-- Rotate hint -->
-    <div id="rotate-hint" class="hidden">↻ Rotate your device for the best experience</div>
+    <div id="rotate-hint" class="hidden">Rotate your device for the best experience</div>
   </div>
 
   <script src="js/game.js"></script>

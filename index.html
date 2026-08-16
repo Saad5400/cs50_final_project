@@ -57,21 +57,40 @@
     <div id="menu" class="overlay">
       <div class="panel">
         <h1 class="title">Space Wars<span class="title-dot">_</span></h1>
-        <p class="subtitle">Defeat the bot. Earn credits. Upgrade your ship.</p>
+        <p class="subtitle">Climb the 15-level campaign. Earn credits. Upgrade your ship.</p>
 
         <div class="money-row">
           <span class="money-label">Credits</span>
           <span id="money" class="money-value">0</span>
         </div>
 
-        <p class="section-label">Difficulty</p>
-        <div class="diff-row" id="diff-row"></div>
+        <div id="streak-row" class="streak-row hidden">
+          <span class="money-label">Win streak</span>
+          <span id="streak-value" class="streak-value">0</span>
+          <span id="streak-next" class="streak-next"></span>
+        </div>
+
+        <p class="section-label">Campaign</p>
+        <div class="camp-card">
+          <div class="camp-info">
+            <div class="camp-level">Level <span id="camp-level">1</span> <span class="camp-total">/ 15</span></div>
+            <div id="camp-ticks" class="camp-ticks"></div>
+            <div id="camp-best" class="camp-best"></div>
+          </div>
+          <div class="camp-actions">
+            <button id="btn-run" class="big-btn primary">Start run</button>
+            <button id="btn-abandon" class="link-btn danger hidden">Abandon run</button>
+          </div>
+        </div>
 
         <p class="section-label">Upgrades</p>
         <div id="upgrades" class="upgrades"></div>
 
+        <p class="section-label">Legacy modes</p>
+        <div class="diff-row" id="diff-row"></div>
+
         <div class="menu-actions">
-          <button id="btn-start" class="big-btn primary">Start battle</button>
+          <button id="btn-start" class="big-btn">Start battle</button>
           <button id="btn-botbattle" class="big-btn">Bot battle</button>
         </div>
         <div class="menu-footer">
@@ -111,8 +130,11 @@
             </ul>
           </div>
         </div>
-        <p class="tip">Your rockets home in on the enemy — upgrade Homing Power to make them relentless.
-        Ships wrap around the top and bottom of the arena. Win fights to earn credits.</p>
+        <p class="tip">The campaign is a 15-level run: each level's bot is faster, smarter, and better armed,
+        rewards grow with the depth, and your HP carries between levels (with a small patch-up) — die and the
+        run is over. Grab the supply drops drifting off the center line: repairs, gas, and ammo surges —
+        smarter bots race you for them. Finish a level flawless, fast, or accurate for bonus credits.
+        Legacy modes keep the original four difficulties, where chaining wins multiplies your rewards.</p>
         <button class="big-btn primary" id="btn-howto-close">Got it</button>
       </div>
     </div>
@@ -132,7 +154,9 @@
     <div id="gameover" class="overlay hidden">
       <div class="panel small">
         <h2 id="go-title">You win</h2>
+        <div id="go-breakdown" class="breakdown hidden"></div>
         <p id="go-reward" class="reward"></p>
+        <p id="go-stats" class="go-stats"></p>
         <div class="menu-actions">
           <button id="btn-again" class="big-btn primary">Play again</button>
           <button id="btn-menu" class="big-btn">Upgrades</button>

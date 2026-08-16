@@ -185,7 +185,8 @@ canvas.addEventListener('mousedown', (e) => {
   if (e.button === 0) input.fireQueued = true;
   if (e.button === 2) input.multiQueued = true;
 });
-canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+// right-click is a game action (barrage) — never show the context menu
+window.addEventListener('contextmenu', (e) => e.preventDefault());
 
 /* gamepad (the original supported joysticks — so do we) */
 let padBtnPrev = [];
@@ -396,7 +397,7 @@ class Ship {
     this.immuneTimer = DODGE_IMMUNE;
     this.clampAndWrap();
     SND.dodge.play();
-    spawnDodgeTrail(this.cx, this.cy, this.side === 'yellow' ? '#37d6e8' : '#ff9a5a');
+    spawnDodgeTrail(this.cx, this.cy, this.side === 'yellow' ? '#aab4ff' : '#ffb08a');
     return true;
   }
 
@@ -701,9 +702,9 @@ function update(dt) {
       const win = winner === 'yellow';
       const title = document.getElementById('go-title');
       title.textContent = botBattle
-        ? (win ? 'YELLOW BOT WINS!' : 'RED BOT WINS!')
-        : (win ? '🏆 YOU WIN!' : '💥 YOU LOSE');
-      title.style.color = win ? 'var(--yellow)' : 'var(--red)';
+        ? (win ? 'Yellow bot wins' : 'Red bot wins')
+        : (win ? 'You win' : 'You lose');
+      title.style.color = win ? 'var(--ink)' : 'var(--error)';
       document.getElementById('go-reward').textContent =
         lastReward > 0 ? '+' + fmtMoney(lastReward) + ' credits earned' : '';
       showOnly('gameover');
@@ -768,7 +769,7 @@ function drawBar(x, y, w, h, pct, color, label) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, w * Math.max(0, Math.min(1, pct)), h);
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.font = 'bold 10px sans-serif';
+  ctx.font = '600 10px Inter, sans-serif';
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   ctx.fillText(label, x + 4, y + h / 2 + 0.5);
@@ -779,22 +780,22 @@ function drawHUD() {
 
   // player (left)
   const hpPct = yellow.health / yellow.maxHealth;
-  const hpColor = hpPct > 0.5 ? '#3ddc84' : hpPct > 0.25 ? '#ffd23f' : '#ff5a5a';
+  const hpColor = hpPct > 0.25 ? '#33d17a' : '#ff4d4d';
   drawBar(12, 12, barW, barH, hpPct, hpColor,
     'HP ' + Math.max(0, Math.ceil(yellow.health)) + '/' + yellow.maxHealth);
-  drawBar(12, 30, barW, barH, yellow.stamina / yellow.maxStamina, '#37d6e8',
+  drawBar(12, 30, barW, barH, yellow.stamina / yellow.maxStamina, 'rgba(255,255,255,0.55)',
     'GAS ' + Math.round(yellow.stamina / yellow.maxStamina * 100) + '%');
 
   // ammo pips
   const pips = Math.min(yellow.maxBullets, 15);
   for (let i = 0; i < pips; i++) {
     ctx.fillStyle = i < yellow.maxBullets - yellow.bullets.length
-      ? '#ffd23f' : 'rgba(255,255,255,0.15)';
+      ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.15)';
     ctx.fillRect(12 + i * 9, 48, 6, 6);
   }
   if (yellow.infinity) {
-    ctx.fillStyle = '#a06bff';
-    ctx.font = 'bold 10px sans-serif';
+    ctx.fillStyle = '#888888';
+    ctx.font = '600 10px Inter, sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText('∞', 14 + pips * 9, 54);
   }
@@ -802,15 +803,15 @@ function drawHUD() {
   // enemy (right)
   const ex = W - 12 - barW;
   const ePct = red.health / red.maxHealth;
-  const eColor = ePct > 0.5 ? '#3ddc84' : ePct > 0.25 ? '#ffd23f' : '#ff5a5a';
+  const eColor = ePct > 0.25 ? '#33d17a' : '#ff4d4d';
   drawBar(ex, 12, barW, barH, ePct, eColor,
     'HP ' + Math.max(0, Math.ceil(red.health)) + '/' + red.maxHealth);
-  drawBar(ex, 30, barW, barH, red.stamina / red.maxStamina, '#37d6e8',
+  drawBar(ex, 30, barW, barH, red.stamina / red.maxStamina, 'rgba(255,255,255,0.55)',
     'GAS ' + Math.round(red.stamina / red.maxStamina * 100) + '%');
 
   // difficulty tag
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ctx.font = 'bold 10px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.font = '600 10px Inter, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText((botBattle ? 'BOT BATTLE — ' : '') + save.difficulty.toUpperCase(), W / 2, H - 12);
 }
@@ -836,11 +837,11 @@ function draw() {
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
   for (const s of stars) ctx.fillRect(s.x, s.y, s.s, s.s);
 
-  // center divider: an energy field instead of the original black bar
+  // center divider: a faint energy field instead of the original black bar
   const grad = ctx.createLinearGradient(W / 2 - 4, 0, W / 2 + 4, 0);
-  grad.addColorStop(0, 'rgba(55,214,232,0)');
-  grad.addColorStop(0.5, 'rgba(55,214,232,0.35)');
-  grad.addColorStop(1, 'rgba(55,214,232,0)');
+  grad.addColorStop(0, 'rgba(26,38,255,0)');
+  grad.addColorStop(0.5, 'rgba(26,38,255,0.3)');
+  grad.addColorStop(1, 'rgba(26,38,255,0)');
   ctx.fillStyle = grad;
   ctx.fillRect(W / 2 - 4, 0, 8, H);
 
@@ -859,18 +860,18 @@ function draw() {
     if (started) drawHUD();
 
     if (!started) {
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = 'bold 26px sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '500 22px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('GET READY…', W / 2, H / 2 - 10);
+      ctx.fillText('Get ready', W / 2, H / 2 - 10);
     }
     if (winner) {
-      ctx.fillStyle = winner === 'yellow' ? '#ffd23f' : '#ff5a5a';
-      ctx.font = 'bold 64px sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '500 52px Inter, sans-serif';
       ctx.textAlign = 'center';
       ctx.shadowColor = 'rgba(0,0,0,0.8)';
       ctx.shadowBlur = 16;
-      ctx.fillText(winner === 'yellow' ? 'YELLOW WINS!' : 'RED WINS!', W / 2, H / 2);
+      ctx.fillText(winner === 'yellow' ? 'Yellow wins' : 'Red wins', W / 2, H / 2);
       ctx.shadowBlur = 0;
     }
   }
@@ -985,7 +986,7 @@ function renderMenu() {
 function toggleMute() {
   save.muted = !save.muted;
   persist();
-  document.getElementById('btn-mute').textContent = save.muted ? '🔇' : '🔊';
+  document.getElementById('btn-mute').classList.toggle('muted', save.muted);
 }
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
@@ -1016,7 +1017,7 @@ document.getElementById('btn-again').onclick = () => startGame(botBattle);
 document.getElementById('btn-menu').onclick = endToMenu;
 document.getElementById('btn-mute').onclick = toggleMute;
 document.getElementById('btn-fs').onclick = toggleFullscreen;
-document.getElementById('btn-mute').textContent = save.muted ? '🔇' : '🔊';
+document.getElementById('btn-mute').classList.toggle('muted', save.muted);
 
 /* ---------------- boot ---------------- */
 resize();

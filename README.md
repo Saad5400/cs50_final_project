@@ -44,6 +44,8 @@ Everything that made the original the original:
 ### What's enhanced
 
 - 📱 **Fully responsive** — the arena scales to any screen, sharp on high-DPI displays.
+- 🖱 **Full mouse controls** — no WASD required: your ship flies to the cursor, left click fires (hold to keep firing), right button boosts, middle click dodges, the wheel barrages. The keyboard stays live the whole time — moving the mouse takes the wheel, pressing a movement key hands it straight back.
+- 📖 **Controls up front** — the guide opens itself on a first visit and is always one press of **H** (or the **?** button on the menu and in the in-game bar) away.
 - 🕹 **Touch controls** — floating virtual joystick + FIRE / DODGE / BARRAGE / BOOST buttons on mobile, in landscape and portrait alike.
 - 🎮 **Gamepad support** — left stick / d-pad to move, A dodge, X fire, Y barrage, RT boost (the original supported joysticks too!).
 - ✨ **Juice** — particle explosions, engine trails, dodge trails, screen shake, hit flashes, hit-stop freeze frames, slow-motion killing blows, floating damage numbers, a low-health warning vignette, immunity shimmer, an energy-field center divider, and an extra drifting starfield layer.
@@ -53,4 +55,4 @@ Everything that made the original the original:
 - 📦 **Supply drops** — repair kits, gas refills, and ammo surges drift off the center line mid-fight. Smarter bots will race you for them.
 - 📊 **Proper HUD** — health and gas bars with ammo pips instead of plain text.
 - ⏸ **Pause menu**, game-over screen with rewards, mute toggle, and fullscreen mode.
-- 🖥 **Modern menu** — difficulty picker, upgrade shop with buy *and* sell buttons (no more hidden right-click!), and a how-to-play screen.
+- 🖥 **Modern menu** — difficulty picker, upgrade shop with buy *and* sell buttons (no more hidden right-click!), and a controls screen.

@@ -32,6 +32,13 @@
             <line class="slash" x1="11" y1="4" x2="14.5" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </button>
+        <button id="btn-help" class="icon-btn" title="Controls (H)" aria-label="Controls">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6.2 6.1a1.85 1.85 0 1 1 2.2 2.2c-.3.1-.4.4-.4.7v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="11.6" r="0.85" fill="currentColor"/>
+          </svg>
+        </button>
         <button id="btn-fs" class="icon-btn" title="Fullscreen (F)" aria-label="Fullscreen">
           <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <path d="M2 6V2h4"/><path d="M10 2h4v4"/><path d="M14 10v4h-4"/><path d="M6 14H2v-4"/>
@@ -93,8 +100,10 @@
           <button id="btn-start" class="big-btn">Start battle</button>
           <button id="btn-botbattle" class="big-btn">Bot battle</button>
         </div>
+        <button id="btn-howto" class="big-btn help-btn">
+          <span class="help-mark">?</span> Controls &amp; how to play
+        </button>
         <div class="menu-footer">
-          <button id="btn-howto" class="link-btn">How to play</button>
           <button id="btn-reset" class="link-btn danger">Reset progress</button>
         </div>
       </div>
@@ -102,18 +111,28 @@
 
     <!-- How to play -->
     <div id="howto" class="overlay hidden">
-      <div class="panel small">
-        <h2>How to play</h2>
+      <div class="panel">
+        <h2>Controls</h2>
+        <p class="howto-lead">Play with the mouse alone, the keyboard alone, or mix the two. Moving the mouse
+        takes the wheel; pressing a movement key hands it straight back.</p>
         <div class="howto-grid">
           <div>
-            <h3>Keyboard &amp; mouse</h3>
+            <h3>Mouse <span class="howto-badge">easiest</span></h3>
+            <ul>
+              <li><b>Move mouse</b> — your ship flies to the cursor</li>
+              <li><b>Left click</b> — fire (hold to keep firing)</li>
+              <li><b>Right hold</b> — boost (drains gas)</li>
+              <li><b>Middle click</b> — dodge blink (45 gas, brief immunity)</li>
+              <li><b>Wheel</b> — barrage</li>
+            </ul>
+            <h3 class="howto-gap">Keyboard</h3>
             <ul>
               <li><b>WASD</b> / <b>Arrows</b> — move</li>
-              <li><b>Shift</b> — boost (drains gas)</li>
-              <li><b>Space</b> — dodge blink (45 gas, brief immunity)</li>
-              <li><b>Enter</b> / <b>J</b> / <b>Click</b> — fire</li>
-              <li><b>B</b> / <b>Right-click</b> — barrage</li>
-              <li><b>Esc</b> pause &middot; <b>M</b> mute &middot; <b>F</b> fullscreen</li>
+              <li><b>Shift</b> — boost</li>
+              <li><b>Space</b> — dodge blink</li>
+              <li><b>Enter</b> / <b>J</b> — fire (hold to keep firing)</li>
+              <li><b>B</b> — barrage</li>
+              <li><b>Esc</b> pause &middot; <b>M</b> mute &middot; <b>F</b> fullscreen &middot; <b>H</b> controls</li>
             </ul>
           </div>
           <div>
@@ -128,6 +147,11 @@
               <li><b>Left stick</b> / <b>D-pad</b> — move</li>
               <li><b>A</b> dodge &middot; <b>X</b> fire &middot; <b>Y</b> barrage &middot; <b>RT</b> boost</li>
             </ul>
+            <h3 class="howto-gap">The goal</h3>
+            <ul>
+              <li>Shoot the red ship down before it shoots you down.</li>
+              <li>Each win pays credits; spend them on upgrades.</li>
+            </ul>
           </div>
         </div>
         <p class="tip">The campaign is a 15-level run: each level's bot is faster, smarter, and better armed,
@@ -135,6 +159,8 @@
         run is over. Grab the supply drops drifting off the center line: repairs, gas, and ammo surges —
         smarter bots race you for them. Finish a level flawless, fast, or accurate for bonus credits.
         Legacy modes keep the original four difficulties, where chaining wins multiplies your rewards.</p>
+        <p class="howto-recall">You can reopen this any time — the <b>?</b> button on the menu, the <b>?</b> in
+        the top bar during a battle, or the <b>H</b> key.</p>
         <button class="big-btn primary" id="btn-howto-close">Got it</button>
       </div>
     </div>
@@ -146,6 +172,9 @@
         <div class="menu-actions">
           <button id="btn-resume" class="big-btn primary">Resume</button>
           <button id="btn-quit" class="big-btn">Quit to menu</button>
+        </div>
+        <div class="menu-footer">
+          <button id="btn-pause-help" class="link-btn">Controls</button>
         </div>
       </div>
     </div>

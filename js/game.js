@@ -89,7 +89,7 @@ const UPGRADES = [
 const DEFAULT_SAVE = {
   maxHealth: 10, maxStamina: 100, speedMulti: 1, maxBullets: 3,
   infinityBullets: false, aimbot: 1, money: 0,
-  difficulty: 'easy', muted: false,
+  difficulty: 'easy', muted: false, seenGuide: false,
   streak: 0, bestStreak: 0,
   bestLevel: 0, run: null, // campaign: furthest level cleared + run in progress
 };
@@ -194,6 +194,7 @@ window.addEventListener('orientationchange', () => setTimeout(resize, 250));
 const input = {
   up: false, down: false, left: false, right: false,
   boostKey: false, boostTouch: false, boostPad: false,
+  fireHeldKey: false,
   fireQueued: false, dodgeQueued: false, multiQueued: false,
   joyX: 0, joyY: 0, padX: 0, padY: 0,
 };
@@ -211,11 +212,16 @@ const KEYMAP = {
 
 window.addEventListener('keydown', (e) => {
   if (e.repeat) return;
+  if (e.code === 'KeyH') { toggleHowto(); return; }
+  if (howtoOpen()) {
+    if (e.code === 'Escape') closeHowto();
+    return;
+  }
   const dir = KEYMAP[e.code];
   if (dir) { input[dir] = true; e.preventDefault(); return; }
   if (state === 'playing') {
     if (e.code === 'Space') { input.dodgeQueued = true; e.preventDefault(); }
-    else if (e.code === 'Enter' || e.code === 'KeyJ') input.fireQueued = true;
+    else if (e.code === 'Enter' || e.code === 'KeyJ') { input.fireQueued = true; input.fireHeldKey = true; }
     else if (e.code === 'KeyB') input.multiQueued = true;
     else if (e.code === 'Escape') pauseGame();
   } else if (state === 'paused' && e.code === 'Escape') {
@@ -227,15 +233,92 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => {
   const dir = KEYMAP[e.code];
   if (dir) input[dir] = false;
+  if (e.code === 'Enter' || e.code === 'KeyJ') input.fireHeldKey = false;
 });
 
-canvas.addEventListener('mousedown', (e) => {
-  if (state !== 'playing') return;
-  if (e.button === 0) input.fireQueued = true;
-  if (e.button === 2) input.multiQueued = true;
+/* mouse: a complete control scheme on its own, for players who'd rather not
+   learn WASD. The ship flies to the cursor, left fires, right boosts, middle
+   dodges, the wheel barrages. Every button is a held state instead of a
+   one-shot click, so a stray context menu or a drag off the canvas can't eat
+   an action — the old right-click barrage lost inputs to exactly that. */
+const MOUSE_DEADZONE = 1.5;   // logical px around the cursor where the ship parks
+const MOUSE_WAKE = 8;         // css px of movement before the cursor takes the wheel
+const FIRE_REPEAT = 0.13;     // seconds between shots while fire is held
+const WHEEL_REPEAT = 0.2;
+
+const mouse = {
+  steering: false,            // cursor is currently driving the ship
+  x: W / 4, y: H / 2,         // target, in logical units
+  lastClientX: 0, lastClientY: 0,
+  fireHeld: false, boostHeld: false,
+  fireTimer: 0, wheelTimer: 0,
+};
+
+function isMouse(e) { return !e.pointerType || e.pointerType === 'mouse'; }
+function aimAt(e) {
+  const r = canvas.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  mouse.x = Math.max(0, Math.min(W, (e.clientX - r.left) / r.width * W));
+  mouse.y = Math.max(0, Math.min(H, (e.clientY - r.top) / r.height * H));
+}
+function releaseMouse() { mouse.fireHeld = false; mouse.boostHeld = false; }
+
+canvas.addEventListener('pointermove', (e) => {
+  if (!isMouse(e)) return;
+  const moved = Math.hypot(e.clientX - mouse.lastClientX, e.clientY - mouse.lastClientY);
+  mouse.lastClientX = e.clientX;
+  mouse.lastClientY = e.clientY;
+  aimAt(e);
+  // a nudge shouldn't yank control away from someone playing on the keyboard
+  if (moved > MOUSE_WAKE) mouse.steering = true;
 });
-// right-click is a game action (barrage) — never show the context menu
-window.addEventListener('contextmenu', (e) => e.preventDefault());
+canvas.addEventListener('pointerdown', (e) => {
+  if (!isMouse(e)) return;
+  e.preventDefault();                       // no text drag, no middle-click autoscroll
+  aimAt(e);
+  mouse.lastClientX = e.clientX;
+  mouse.lastClientY = e.clientY;
+  mouse.steering = true;
+  // capture keeps the matching pointerup ours even if the drag leaves the canvas
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  if (state !== 'playing') return;
+  if (e.button === 0) { input.fireQueued = true; mouse.fireHeld = true; mouse.fireTimer = FIRE_REPEAT; }
+  else if (e.button === 1) input.dodgeQueued = true;
+  else if (e.button === 2) mouse.boostHeld = true;
+});
+canvas.addEventListener('pointerup', (e) => {
+  if (!isMouse(e)) return;
+  if (e.button === 0) mouse.fireHeld = false;
+  else if (e.button === 2) mouse.boostHeld = false;
+  try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+});
+canvas.addEventListener('pointercancel', (e) => { if (isMouse(e)) releaseMouse(); });
+canvas.addEventListener('auxclick', (e) => e.preventDefault());
+canvas.addEventListener('dragstart', (e) => e.preventDefault());
+canvas.addEventListener('wheel', (e) => {
+  if (state !== 'playing') return;
+  e.preventDefault();
+  if (mouse.wheelTimer > 0) return;
+  mouse.wheelTimer = WHEEL_REPEAT;
+  input.multiQueued = true;
+}, { passive: false });
+
+/* the right button is a game control, so the context menu has to stay down over
+   the playfield — and everywhere else mid-battle, since a right-drag can carry
+   the pointer off the canvas before the menu event fires */
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+window.addEventListener('contextmenu', (e) => { if (state === 'playing') e.preventDefault(); });
+
+/* never leave a key or button stuck down when the window loses focus */
+function releaseAllInput() {
+  input.up = input.down = input.left = input.right = false;
+  input.boostKey = false;
+  input.fireHeldKey = false;
+  releaseMouse();
+  clearQueued();
+}
+window.addEventListener('blur', releaseAllInput);
+document.addEventListener('visibilitychange', () => { if (document.hidden) releaseAllInput(); });
 
 /* gamepad (the original supported joysticks — so do we) */
 let padBtnPrev = [];
@@ -505,6 +588,7 @@ let bgScroll1 = 0, bgScroll2 = 0;
 let hitStop = 0;           // brief freeze-frame on every hit (real seconds)
 let slowMo = 0;            // slow-motion window after the killing blow
 let matchStats = { shots: 0, hits: 0, dodges: 0, dmgTaken: 0 };
+let hintTimer = 0;         // seconds the on-canvas control hint stays up
 
 /* floating combat text (damage numbers, pickups, bonuses) */
 let floaters = [];
@@ -676,7 +760,9 @@ function beginBattle(cfg, opts) {
   slowMo = 0;
   matchStats = { shots: 0, hits: 0, dodges: 0, dmgTaken: 0 };
   shake = 0;
+  hintTimer = 4;
   clearQueued();
+  releaseMouse();
 
   showOnly(null);
   document.getElementById('gamebar').classList.remove('hidden');
@@ -869,15 +955,36 @@ function handlePlayer(dt) {
 
   let dx = (input.right ? 1 : 0) - (input.left ? 1 : 0) + input.joyX + input.padX;
   let dy = (input.down ? 1 : 0) - (input.up ? 1 : 0) + input.joyY + input.padY;
-  const len = Math.hypot(dx, dy);
-  if (len > 1) { dx /= len; dy /= len; }
+  let mag = Math.hypot(dx, dy);
+  let toCursor = Infinity;
 
-  p.applyBoost((input.boostKey || input.boostTouch || input.boostPad) && len > 0.01, dt);
-  p.x += dx * p.vel * dt;
-  p.y += dy * p.vel * dt;
+  if (mag > 0.01) {
+    mouse.steering = false;              // a movement key takes the wheel straight back
+    if (mag > 1) { dx /= mag; dy /= mag; mag = 1; }
+  } else if (mouse.steering) {
+    // fly to the cursor, clamped to our own half so the ship can't stall on the divider
+    const tx = Math.min(Math.max(mouse.x, SHIP_W / 2), W / 2 - SHIP_W / 2 - 8);
+    dx = tx - p.cx; dy = mouse.y - p.cy;
+    toCursor = Math.hypot(dx, dy);
+    if (toCursor > MOUSE_DEADZONE) { dx /= toCursor; dy /= toCursor; mag = 1; }
+    else { dx = 0; dy = 0; mag = 0; }
+  } else {
+    dx = 0; dy = 0; mag = 0;
+  }
+
+  const wantBoost = input.boostKey || input.boostTouch || input.boostPad || mouse.boostHeld;
+  p.applyBoost(wantBoost && mag > 0.01, dt);
+  const step = Math.min(p.vel * dt, toCursor);   // never overshoot the cursor
+  p.x += dx * step;
+  p.y += dy * step;
   p.clampAndWrap();
   p.moveX = p.x - prevX;
   p.moveY = p.y - prevY;
+
+  if ((mouse.fireHeld || input.fireHeldKey) && mouse.fireTimer <= 0) {
+    input.fireQueued = true;
+    mouse.fireTimer = FIRE_REPEAT;
+  }
 
   if (input.dodgeQueued) { input.dodgeQueued = false; p.dodge(); }
   if (input.fireQueued) { input.fireQueued = false; p.fire(); }
@@ -941,6 +1048,9 @@ let lastTime = performance.now();
 function update(dt) {
   now += dt;
   pollGamepad();
+  mouse.fireTimer -= dt;
+  mouse.wheelTimer -= dt;
+  if (started) hintTimer = Math.max(0, hintTimer - dt);
 
   // parallax scrolling (bottom strip scrolls faster, like the original)
   if (!winner) {
@@ -1055,6 +1165,55 @@ function drawBar(x, y, w, h, pct, color, label) {
   ctx.fillText(label, x + 4, y + h / 2 + 0.5);
 }
 
+/* cursor reticle: makes "your ship flies here" obvious without a word of text */
+function drawReticle() {
+  const x = mouse.x, y = mouse.y;
+  // fade out as the ship arrives — it marks a destination, not the ship itself
+  const closing = Math.min(1, Math.hypot(x - yellow.cx, y - yellow.cy) / 45);
+  const alpha = closing * (x < W / 2 - 6 ? 0.7 : 0.25);  // dim over enemy airspace
+  if (alpha < 0.03) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = '#ffd23f';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x - 15, y); ctx.lineTo(x - 5, y);
+  ctx.moveTo(x + 5, y); ctx.lineTo(x + 15, y);
+  ctx.moveTo(x, y - 15); ctx.lineTo(x, y - 5);
+  ctx.moveTo(x, y + 5); ctx.lineTo(x, y + 15);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* the controls, spelled out on the playfield for the first seconds of a battle */
+function drawControlHint() {
+  const fade = !started ? 1 : Math.min(1, hintTimer / 1.2);
+  if (fade <= 0) return;
+  const text = isTouchDevice
+    ? 'Stick to move · tap Fire · hold Boost'
+    : 'Move: mouse or WASD · Fire: left click · Boost: hold right click · H for all controls';
+  ctx.save();
+  ctx.globalAlpha = fade;
+  ctx.font = '500 12px Inter, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // the parallax strip down here is bright, so the hint carries its own backing
+  const w = ctx.measureText(text).width + 22;
+  const y = H - 34;
+  ctx.fillStyle = 'rgba(10,10,10,0.72)';
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(W / 2 - w / 2, y - 11, w, 22, 11);
+    ctx.fill();
+  } else {
+    ctx.fillRect(W / 2 - w / 2, y - 11, w, 22);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.82)';
+  ctx.fillText(text, W / 2, y + 0.5);
+  ctx.restore();
+}
+
 function drawHUD() {
   const barW = 190, barH = 13;
 
@@ -1112,7 +1271,15 @@ function drawHUD() {
   ctx.fillText(tag, W / 2, H - 12);
 }
 
+let cursorHidden = false;
+function setCursorHidden(hide) {
+  if (hide === cursorHidden) return;
+  cursorHidden = hide;
+  canvas.style.cursor = hide ? 'none' : '';
+}
+
 function draw() {
+  setCursorHidden(state === 'playing' && mouse.steering && !botBattle);
   ctx.save();
   if (shake > 0) {
     ctx.translate((Math.random() - 0.5) * 12 * shake, (Math.random() - 0.5) * 12 * shake);
@@ -1155,7 +1322,9 @@ function draw() {
     drawBullets(yellow);
     drawBullets(red);
     drawFloaters();
+    if (mouse.steering && !botBattle && !winner) drawReticle();
     if (started) drawHUD();
+    if (!botBattle && !winner) drawControlHint();
 
     // danger vignette: subtle pulsing red edge when the player is nearly dead
     if (started && !winner && !botBattle && yellow.health / yellow.maxHealth <= 0.25) {
@@ -1420,6 +1589,26 @@ function renderMenu() {
   }
 }
 
+/* control guide: opens itself on a first visit, and stays one button (or H) away */
+let howtoReturn = 'menu';
+function howtoOpen() {
+  return !document.getElementById('howto').classList.contains('hidden');
+}
+function openHowto(from) {
+  howtoReturn = from || 'menu';
+  showOnly('howto');
+}
+function closeHowto() {
+  if (!save.seenGuide) { save.seenGuide = true; persist(); }
+  showOnly(howtoReturn);
+}
+function toggleHowto() {
+  if (howtoOpen()) { closeHowto(); return; }
+  if (state === 'playing') { pauseGame(); openHowto('pause'); }
+  else if (state === 'paused') openHowto('pause');
+  else openHowto(state === 'gameover' ? 'gameover' : 'menu');
+}
+
 function toggleMute() {
   save.muted = !save.muted;
   persist();
@@ -1453,8 +1642,10 @@ document.getElementById('btn-reset').onclick = () => {
     renderMenu();
   }
 };
-document.getElementById('btn-howto').onclick = () => showOnly('howto');
-document.getElementById('btn-howto-close').onclick = () => showOnly('menu');
+document.getElementById('btn-howto').onclick = () => openHowto('menu');
+document.getElementById('btn-howto-close').onclick = closeHowto;
+document.getElementById('btn-help').onclick = toggleHowto;
+document.getElementById('btn-pause-help').onclick = () => openHowto('pause');
 document.getElementById('btn-pause').onclick = pauseGame;
 document.getElementById('btn-resume').onclick = resumeGame;
 document.getElementById('btn-quit').onclick = endToMenu;
@@ -1471,7 +1662,9 @@ document.getElementById('btn-mute').classList.toggle('muted', save.muted);
 resize();
 loadImages().then(() => {
   renderMenu();
-  showOnly('menu');
+  // first-time visitors get the controls before they get the menu
+  if (save.seenGuide) showOnly('menu');
+  else openHowto('menu');
   requestAnimationFrame((t) => {
     lastTime = t;
     requestAnimationFrame(loop);
